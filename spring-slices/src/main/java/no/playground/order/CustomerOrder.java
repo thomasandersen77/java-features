@@ -10,6 +10,7 @@ import java.util.Objects;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -35,14 +36,14 @@ public class CustomerOrder {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal totalAmount;
 
-@Column(nullable = false)
+    @Column(nullable = false)
     private Instant createdAt;
 
     @OneToMany(
             mappedBy = "order",
             cascade = CascadeType.ALL,
             orphanRemoval = true,
-            fetch = jakarta.persistence.FetchType.EAGER)
+            fetch = FetchType.EAGER)
     private final List<OrderLine> lines = new ArrayList<>();
 
     protected CustomerOrder() {
