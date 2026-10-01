@@ -35,10 +35,10 @@ public class CustomerOrder {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal totalAmount;
 
-    @Column(nullable = false)
+@Column(nullable = false)
     private Instant createdAt;
 
-@OneToMany(
+    @OneToMany(
             mappedBy = "order",
             cascade = CascadeType.ALL,
             orphanRemoval = true,
