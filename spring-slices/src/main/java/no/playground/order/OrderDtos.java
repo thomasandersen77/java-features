@@ -5,7 +5,6 @@ import java.time.Instant;
 import java.util.List;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -29,28 +28,39 @@ public final class OrderDtos {
     ) {
     }
 
+    public record OrderLineResponse(
+            Long catalogItemId,
+            String itemName,
+            int quantity,
+            BigDecimal unitPrice,
+            BigDecimal lineTotal
+    ) {
+        static OrderLineResponse from(OrderLine line) {
+            return new OrderLineResponse(
+                    line.getCatalogItemId(),
+                    line.getItemName(),
+                    line.getQuantity(),
+                    line.getUnitPrice(),
+                    line.lineTotal()
+            );
+        }
+    }
+
     public record OrderResponse(
             Long id,
             String customerName,
             BigDecimal totalAmount,
-            Instant createdAt
+            Instant createdAt,
+            List<OrderLineResponse> lines
     ) {
         static OrderResponse from(CustomerOrder order) {
             return new OrderResponse(
                     order.getId(),
                     order.getCustomerName(),
                     order.getTotalAmount(),
-                    order.getCreatedAt()
+                    order.getCreatedAt(),
+                    order.getLines().stream().map(OrderLineResponse::from).toList()
             );
         }
-    }
-
-    /** Placeholder until line items are modelled on the entity. */
-    public record OrderLineResponse(
-            Long catalogItemId,
-            String itemName,
-            int quantity,
-            @DecimalMin("0.00") BigDecimal unitPrice
-    ) {
     }
 }

@@ -1,7 +1,7 @@
 package no.playground.order;
 
-import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -9,37 +9,41 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import no.playground.catalog.CatalogItem;
+import no.playground.catalog.CatalogItemRepository;
 import no.playground.order.OrderDtos.CreateOrderRequest;
+import no.playground.order.OrderDtos.OrderLineRequest;
 import no.playground.order.OrderDtos.OrderResponse;
 
 /**
  * Application service for the order vertical slice.
- *
- * <p>TODO checklist (mirror catalog, then extend):
- * <ol>
- *   <li>Resolve each {@code catalogItemId} via {@code CatalogItemRepository}.</li>
- *   <li>Compute total with {@link BigDecimal} (unit price × quantity).</li>
- *   <li>Persist {@link CustomerOrder} (and later line items).</li>
- *   <li>Map 404 when catalog item missing; 400 on empty/invalid lines.</li>
- * </ol>
+ * Resolves catalog items, computes BigDecimal totals, and persists order + lines.
  */
 @Service
 @Transactional
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    // TODO: private final CatalogItemRepository catalogItemRepository;
+    private final CatalogItemRepository catalogItemRepository;
 
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, CatalogItemRepository catalogItemRepository) {
         this.orderRepository = orderRepository;
+        this.catalogItemRepository = catalogItemRepository;
     }
 
     public OrderResponse place(CreateOrderRequest request) {
-        // TODO: look up catalog items, sum lines, save full order graph
-        var stubTotal = BigDecimal.ZERO;
-        var saved = orderRepository.save(
-                new CustomerOrder(request.customerName(), stubTotal, Instant.now())
-        );
+        var lines = new ArrayList<OrderLine>();
+        for (OrderLineRequest lineRequest : request.lines()) {
+            var item = requireCatalogItem(lineRequest.catalogItemId());
+            lines.add(new OrderLine(
+                    item.getId(),
+                    item.getName(),
+                    lineRequest.quantity(),
+                    item.getPrice()
+            ));
+        }
+
+        var saved = orderRepository.save(new CustomerOrder(request.customerName(), Instant.now(), lines));
         return OrderResponse.from(saved);
     }
 
@@ -55,5 +59,12 @@ public class OrderService {
         return orderRepository.findAllByOrderByCreatedAtDesc().stream()
                 .map(OrderResponse::from)
                 .toList();
+    }
+
+    private CatalogItem requireCatalogItem(Long catalogItemId) {
+        return catalogItemRepository.findById(catalogItemId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Catalog item not found: " + catalogItemId));
     }
 }

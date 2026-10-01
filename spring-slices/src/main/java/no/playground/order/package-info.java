@@ -1,16 +1,15 @@
 /**
- * Spring Boot vertical slice skeleton: customer orders.
+ * Spring Boot vertical slice: customer orders.
  *
- * <p>Next exercise after {@link no.playground.catalog}: wire REST + JPA the same way.
- * Pure-Java domain practice lives in {@code no.playground.features.shop} — keep that
- * separate from these Spring types.
+ * <p>Mirrors {@link no.playground.catalog}: REST + JPA + validation.
+ * Pure-Java domain practice lives in {@code no.playground.features.shop}.
  *
  * <pre>
- * OrderController → OrderService → OrderRepository → CustomerOrder
+ * OrderController → OrderService → OrderRepository → CustomerOrder (+ OrderLine)
  *        ↑               ↑
- *     OrderDtos     (TODO: implement)
+ *     OrderDtos    CatalogItemRepository (prices / existence)
  * </pre>
  *
- * <p>Intended REST base path: {@code /api/orders}.
+ * <p>REST base path: {@code /api/orders}.
  */
 package no.playground.order;

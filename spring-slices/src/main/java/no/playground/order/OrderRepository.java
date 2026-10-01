@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OrderRepository extends JpaRepository<CustomerOrder, Long> {
 
-    // TODO: List<CustomerOrder> findByCustomerNameIgnoreCase(String customerName);
+    List<CustomerOrder> findByCustomerNameIgnoreCaseOrderByCreatedAtDesc(String customerName);
 
     List<CustomerOrder> findAllByOrderByCreatedAtDesc();
 }
