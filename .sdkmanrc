@@ -1,0 +1,2 @@
+# Enable cd auto-switch with: sdk env install && sdk env
+java=26.0.2-tem
