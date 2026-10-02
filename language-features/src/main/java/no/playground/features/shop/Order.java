@@ -1,6 +1,5 @@
 package no.playground.features.shop;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -13,7 +12,7 @@ public class Order {
     public Order(
             UUID id,
             Customer customer,
-            ArrayList<OrderItem> orderItems
+            List<OrderItem> orderItems
     ) {
         if(orderItems.isEmpty()) {
             throw new IllegalArgumentException("OrderItems can not be empty");
@@ -36,7 +35,7 @@ public class Order {
         return id;
     }
 
-    public void addOrder(OrderItem orderItem) {
+    public void addItem(OrderItem orderItem) {
         isValidItem(orderItem);
         items.add(orderItem);
     }

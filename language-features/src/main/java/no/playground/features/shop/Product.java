@@ -4,17 +4,19 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 public record Product(
-        int quantity,
+        String name,
+        String description,
         BigDecimal price
 ) {
     public Product {
        Objects.requireNonNull(price);
-       validateQuantity(quantity);
+       Objects.requireNonNull(name);
+       validateName(name);
     }
 
-    private void validateQuantity(int quantity) {
-        if(quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than zero");
+    private void validateName(String name) {
+        if(name.isBlank()) {
+            throw new IllegalArgumentException("Product name cannot be blank");
         }
     }
 }

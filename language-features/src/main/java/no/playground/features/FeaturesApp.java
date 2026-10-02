@@ -3,6 +3,7 @@ package no.playground.features;
 import java.util.List;
 
 import no.playground.features.shop.CartService;
+import no.playground.features.shop.Cart;
 
 /**
  * Entry point for experimenting with the latest Java language features.
@@ -21,7 +22,7 @@ public class FeaturesApp {
 
     /** Skjelett-kall — fylles ut når ShoppingCart + CartService er implementert. */
     static void cartSketch() {
-        var cartService = new CartService();
+        var cartService = new CartService(new Cart());
         // TODO: cartService.addToCart(new Product(...));
         // TODO: cartService.checkout(new Customer());
         System.out.println("CartService klar: " + cartService.getClass().getSimpleName());

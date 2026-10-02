@@ -39,6 +39,6 @@ public final class SealedClassesExample {
         );
 
         System.out.println("--- sealed classes ---");
-        samples.forEach(r -> System.out.println(describe(r)));
+        samples.forEach(r -> IO.println(describe(r)));
     }
 }

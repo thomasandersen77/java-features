@@ -1,5 +1,10 @@
 package no.playground.features.shop;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
 /**
  * Orkestrerer handlekurv-flyten (pure Java — ikke Spring).
  * Du eier ShoppingCart — denne klassen skal bare koordinere.
@@ -21,25 +26,58 @@ package no.playground.features.shop;
  */
 public class CartService {
 
-    // TODO: hold på (eller motta) ShoppingCart — din modell
-    // private final ShoppingCart cart;
+    private final Cart cart;
 
-    public CartService() {
-        // TODO: initialiser cart
+    public CartService(Cart cart) {
+        this.cart = cart;
     }
 
-    public void addToCart(Product product) {
-        // TODO: valider product, wrap i OrderItem, legg i cart
-        throw new UnsupportedOperationException("not implemented — din tur");
+    public void addToCart(Product product, int quantity) {
+        cart.addItem(new OrderItem(product, quantity));
+        describe(new CartEvent.ItemAdded(product, quantity));
     }
 
     public void removeFromCart(Product product) {
-        // TODO
-        throw new UnsupportedOperationException("not implemented — din tur");
+        cart.removeProduct(product);
+        describe(new CartEvent.ItemRemoved(product));
     }
 
     public Order checkout(Customer customer) {
-        // TODO: cart -> Order(id, customer, items)
-        throw new UnsupportedOperationException("not implemented — din tur");
+        validateOrderDetails(customer, cart.getItems());
+        Order order = new Order(UUID.randomUUID(), customer, cart.getItems());
+        describe(new CartEvent.CartCheckedOut(customer));
+        return order;
+    }
+
+    private void validateOrderDetails(
+            Customer customer,
+            List<OrderItem> items) {
+        Objects.requireNonNull(customer, "Customer can not be null");
+        Objects.requireNonNull(items, "OrderItems can not be null");
+
+        if(items.isEmpty()) {
+            throw new IllegalArgumentException("OrderItems can not be empty");
+        }
+    }
+
+    public BigDecimal getTotal() {
+        return cart.total();
+    }
+
+    void describe(CartEvent event) {
+        switch (event) {
+            case CartEvent.ItemAdded(var product, var quantity) ->
+                    IO.println("Added %d x %s to cart".formatted(quantity, product.name()));
+            case CartEvent.ItemRemoved(var product) ->
+                    IO.println("Removed %s from cart".formatted(product.name()));
+            case CartEvent.CartCheckedOut(var customer) ->
+                    IO.println("Checked out cart for %s".formatted(customer));
+        }
+    }
+
+    sealed interface CartEvent permits CartEvent.ItemAdded, CartEvent.ItemRemoved, CartEvent.CartCheckedOut {
+        record ItemAdded(Product product, int quantity) implements CartEvent {}
+        record ItemRemoved(Product product) implements CartEvent {}
+        record CartCheckedOut(Customer customer) implements CartEvent {}
     }
 }
